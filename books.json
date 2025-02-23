@@ -1,0 +1,54 @@
+[
+    {
+        "title": "La Peste",
+        "author": "Albert Camus",
+        "id": "67baae7d0093b",
+        "available": true,
+        "borrowedBy": null
+    },
+    {
+        "title": "La Strat\u00e9gie du Choc",
+        "author": "Naomi Klein",
+        "id": "67baae98b56e6",
+        "available": true,
+        "borrowedBy": null
+    },
+    {
+        "title": "L'Insoutenable L\u00e9g\u00e8ret\u00e9 de l'\u00eatre",
+        "author": "Milan Kundera",
+        "id": "67baaec557300",
+        "available": true
+    },
+    {
+        "title": "Don Quichotte",
+        "author": "Miguel de Cervantes",
+        "id": "67baaee666fac",
+        "available": true
+    },
+    {
+        "title": "Le Meilleur des mondes",
+        "author": "Aldous Huxley",
+        "id": "67baaf06d81cf",
+        "available": true
+    },
+    {
+        "title": "\u00c0 la recherche du temps perdu",
+        "author": "Marcel Proust",
+        "id": "67baaf226c905",
+        "available": true,
+        "borrowedBy": null
+    },
+    {
+        "title": "Frankenstein",
+        "author": "Mary Shelley",
+        "id": "67baaf552866b",
+        "available": true
+    },
+    {
+        "title": "tinah",
+        "author": "moi",
+        "id": "67baaf621296a",
+        "available": true,
+        "borrowedBy": null
+    }
+]

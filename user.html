@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface Utilisateur</title>
+    <script src="https://unpkg.com/angular@1.8.2/angular.min.js"></script>
+    <link rel="stylesheet" href="user.css">
+</head>
+<body ng-app="userApp" ng-controller="UserController">
+
+    <div class="container">
+        <h1>
+            Interface Utilisateur
+            <button id="logoutButton" onclick="logout()">Se déconnecter</button>
+        </h1>
+
+        <h2>Liste des Livres Disponibles</h2>
+        <ul>
+            <li ng-repeat="book in books track by book.id" ng-if="book.available">
+                <span>{{ book.title }} par {{ book.author }}</span>
+                <button ng-click="borrowBook(book.id)">Emprunter</button>
+            </li>
+        </ul>
+
+        <h3 class="message" ng-if="returnMessage">{{ returnMessage }}</h3>
+    </div>
+
+    <script>
+        var app = angular.module('userApp', []);
+        app.controller('UserController', function($scope) {
+            $scope.books = [];
+            $scope.user = "Utilisateur 1"; // Peut être récupéré de la session
+            $scope.returnMessage = ""; // Message de retour après emprunt
+
+            // Charger les livres depuis server.php
+            function loadBooks() {
+                fetch('server.php?action=getBooks')
+                    .then(response => response.json())
+                    .then(data => {
+                        $scope.$apply(function() {
+                            $scope.books = data;
+                        });
+                    })
+                    .catch(error => console.error('Erreur lors du chargement des livres:', error));
+            }
+
+            loadBooks(); // Charger les livres au chargement de la page
+
+            // Emprunter un livre
+            $scope.borrowBook = function(bookId) {
+                let borrowDate = new Date();
+                let returnDate = new Date();
+                returnDate.setDate(borrowDate.getDate() + 20); // Ajouter 20 jours
+
+                fetch('server.php?action=borrowBook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookId: bookId, user: $scope.user, returnDate: returnDate.toISOString().split('T')[0] })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    $scope.$apply(function() {
+                        // Mettre à jour la liste en supprimant le livre emprunté
+                        $scope.books = $scope.books.filter(book => book.id !== bookId);
+                        $scope.returnMessage = "Emprunt réussi ! Retour prévu le : " + returnDate.toLocaleDateString();
+                    });
+                })
+                .catch(error => console.error('Erreur lors de l\'emprunt:', error));
+            };
+        });
+
+        function logout() {
+            localStorage.removeItem('loggedIn');
+            localStorage.removeItem('userId');
+            window.location.href = 'login.html';  // Rediriger vers la page de connexion après déconnexion
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <script src="https://unpkg.com/angular@1.8.2/angular.min.js"></script>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    background-color: #f5ebe0; /* Beige clair */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+form {
+    background-color: #8b5e3c; /* Marron */
+    color: #fff; /* Texte blanc */
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #a67c52; /* Beige foncé */
+    border-radius: 5px;
+}
+
+button {
+    background-color: #a67c52; /* Marron clair */
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #7d5235; /* Marron plus foncé */
+}
+
+p {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+    </style>
+</head>
+<body ng-app="loginApp" ng-controller="LoginController">
+
+    
+
+    <form ng-submit="login()">
+        <h1>Formulaire de Connexion</h1>
+        <label for="userId">Identifiant:</label>
+        <input type="text" id="userId" ng-model="credentials.userId" required><br><br>
+
+        <label for="password">Mot de passe:</label>
+        <input type="password" id="password" ng-model="credentials.password" required><br><br>
+
+        <button type="submit">Se connecter</button>
+        
+
+        <p ng-if="errorMessage" style="color: red;">{{errorMessage}}</p>
+    </form>
+
+    <script>
+        var app = angular.module('loginApp', []);
+        app.controller('LoginController', function($scope, $window) {
+            $scope.credentials = { userId: '', password: '' };
+            $scope.errorMessage = '';
+
+            $scope.login = function() {
+                // Vérifier les identifiants
+                if ($scope.credentials.userId === 'admin' && $scope.credentials.password === 'admin') {
+                    localStorage.setItem('loggedIn', 'true');
+                    localStorage.setItem('userId', 'admin');
+                    $window.location.href = 'librarian.html';
+                } else if ($scope.credentials.userId === 'user' && $scope.credentials.password === '1234') {
+                    localStorage.setItem('loggedIn', 'true');
+                    localStorage.setItem('userId', 'user');
+                    $window.location.href = 'user.html';
+                } else {
+                    $scope.errorMessage = 'Identifiant ou mot de passe incorrect';
+                }
+            };
+        });
+    </script>
+
+</body>
+</html>

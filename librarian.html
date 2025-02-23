@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface Bibliothécaire</title>
+    <script src="https://unpkg.com/angular@1.8.2/angular.min.js"></script>
+    <link rel="stylesheet" href="librarian.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Couleurs principales */
+        body {
+            background-color: rgb(91, 62, 30);
+            color: #3e2b2b;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+       /* Header */
+        header {
+            background-color: #8e4b2d;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            width: 100%; /* Assure que le header couvre toute la largeur */
+            position: fixed; /* Fixe le header en haut */
+            top: 0;
+            left: 0;
+            z-index: 1000; /* Assure que le header soit au-dessus du contenu */
+        }
+
+        /* Centrer le bouton de déconnexion légèrement */
+        .logout {
+            margin-left: 20px;  /* Ajoute un petit espace à gauche pour recentrer */
+            margin-right: 30px; /* Ajoute un petit espace à droite */
+        }
+
+
+
+        .container {
+            margin: 80px;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+        /* Les colonnes deviennent indépendantes et ont des tailles flexibles */
+        .left-column, .right-column {
+            transition: width 0.3s ease;
+            background-color: #d8c8b2; /* Beige clair pour les colonnes */
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%; /* Taille initiale des colonnes */
+        }
+
+       
+
+        /* Flexbox pour organiser les sections côte à côte */
+        .content {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 20px;
+            width: 180vh;
+        }
+
+       
+
+        /* Liste des livres */
+        .book-list ul {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .book-list li {
+            background-color: white;
+            padding: 15px;
+            border-style: dotted;
+            border-color: #5d2b1d;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Section d'ajout de livre */
+        .add-book {
+            height: 300px;
+            width: 450px;
+            text-align: center;
+            padding: 10px;
+            margin-left: 20px;
+            border-radius: 8px;
+            border-color: #8e4b2d;
+            border-style: groove;
+            background-color: white;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .left-column, .right-column {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body ng-app="librarianApp" ng-controller="LibrarianController">
+
+    
+    <header>
+        <div>Interface Bibliothécaire</div>
+    
+  
+        <div style="flex-grow: 1; text-align: center;">
+            <input type="text" ng-model="searchQuery" placeholder="Rechercher un livre..." style="padding: 5px; width: 60%; border-radius: 4px; border: 1px solid #ccc;">
+        </div>
+    
+        <div class="logout">
+            <button onclick="logout()" style="background-color: #8e4b2d;"><i class="fas fa-sign-out-alt"></i> Se déconnecter</button>
+        </div>
+    </header>
+    
+    
+
+  
+    <div class="container">
+        <div class="content">
+            <div class="left-column">
+                <section class="book-list">
+                    <h2>Liste des Livres</h2>
+                    <ul>
+                        <li ng-repeat="book in books | filter:searchQuery track by book.id">
+                            <div ng-if="!book.editing">
+                                <span><strong>Titre : </strong> {{ book.title }} <strong>écrit par </strong>{{ book.author }} 
+                                    <span ng-if="!book.available" class="status unavailable">(Emprunté)</span>
+                                </span>
+                                <div class="actions">
+                                    <button ng-click="editBook(book)"><i class="fas fa-edit"></i> </button>
+                                    <button ng-click="deleteBook(book.id)"><i class="fas fa-trash-alt"></i> </button>
+                                    <button ng-if="!book.available" ng-click="returnBook(book.id)" style="background-color: #8e4b2d;"><i class="fas fa-undo"></i> Marqué retourné</button>
+                                </div>
+                            </div>
+                            <div ng-if="book.editing">
+                                <input type="text" ng-model="book.newTitle" placeholder="Titre">
+                                <input type="text" ng-model="book.newAuthor" placeholder="Auteur">
+                                <div class="actions">
+                                    <button ng-click="updateBook(book)"><i class="fas fa-save"></i> Enregistrer</button>
+                                    <button ng-click="book.editing = false"><i class="fas fa-times"></i> Annuler</button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+                
+            </div>
+
+            <div>
+                <section class="add-book">
+                    <h2>Ajouter un Livre</h2>
+                    <input type="text" ng-model="newBook.title" placeholder="Titre">
+                    <input type="text" ng-model="newBook.author" placeholder="Auteur">
+                    <button ng-click="addBook()" style="background-color: #8e4b2d;"><i class="fas fa-plus"></i> Ajouter</button>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('librarianApp', []); 
+        app.controller('LibrarianController', function($scope) {
+            $scope.books = [];
+            $scope.newBook = {};
+
+            // Charger les livres
+            function loadBooks() {
+                fetch('server.php?action=getBooks')
+                    .then(response => response.json())
+                    .then(data => {
+                        $scope.$apply(() => {
+                            $scope.books = data.map(book => ({
+                                ...book,
+                                editing: false,
+                                newTitle: book.title,
+                                newAuthor: book.author
+                            }));
+                        });
+                    })
+                    .catch(error => console.error('Erreur lors du chargement des livres:', error));
+            }
+
+            loadBooks(); // Charger les livres au chargement de la page
+
+            // Ajouter un livre
+            $scope.addBook = function() {
+                if (!$scope.newBook.title || !$scope.newBook.author) {
+                    alert("Veuillez remplir tous les champs.");
+                    return;
+                }
+
+                fetch('server.php?action=addBook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify($scope.newBook)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    $scope.$apply(() => {
+                        $scope.books.push({
+                            id: data.id,
+                            title: $scope.newBook.title,
+                            author: $scope.newBook.author,
+                            available: true,
+                        });
+                        $scope.newBook = {}; // Réinitialiser le formulaire
+                    });
+                })
+                .catch(error => console.error('Erreur lors de l\'ajout:', error));
+            };
+
+            // Modifier un livre
+            $scope.editBook = function(book) {
+                book.editing = true;
+            };
+
+            $scope.updateBook = function(book) {
+                fetch('server.php?action=updateBook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: book.id,
+                        title: book.newTitle,
+                        author: book.newAuthor
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    $scope.$apply(() => {
+                        book.title = book.newTitle;
+                        book.author = book.newAuthor;
+                        book.editing = false;
+                    });
+                })
+                .catch(error => console.error('Erreur lors de la modification:', error));
+            };
+
+            // Supprimer un livre
+            $scope.deleteBook = function(bookId) {
+                fetch('server.php?action=deleteBook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: bookId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    $scope.$apply(() => {
+                        $scope.books = $scope.books.filter(book => book.id !== bookId);
+                    });
+                })
+                .catch(error => console.error('Erreur lors de la suppression:', error));
+            };
+
+            // Retourner un livre
+            $scope.returnBook = function(bookId) {
+                console.log("ID du livre à retourner:", bookId);  // Vérifie si l'ID est correct
+
+                fetch('server.php?action=returnBook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookId: bookId }) 
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Réponse du serveur:", data);  // Affiche la réponse du serveur
+                    alert(data.message || data.error); // Affiche l'erreur si elle existe
+                    $scope.$apply(() => {
+                        let book = $scope.books.find(b => b.id == bookId);
+                        if (book) {
+                            book.available = true;
+                        } else {
+                            console.error("Livre non trouvé dans la liste !");
+                        }
+                    });
+                })
+                .catch(error => console.error('Erreur lors du retour du livre:', error));
+            };
+
+
+        // Fonction de déconnexion
+        function logout() {
+            localStorage.removeItem('loggedIn');
+            localStorage.removeItem('userId');
+            window.location.href = 'login.html';  // Rediriger vers la page de connexion
+        }
+    });
+    </script>
+
+</body>
+</html>
